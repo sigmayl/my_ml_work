@@ -1,0 +1,48 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Lint
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Test
+        run: python -m pytest -q --cov=llm_triage --cov-report=term-missing
+
+      - name: Smoke-test the CLI against the fixture log
+        run: |
+          python -m llm_triage.cli parse logs/run_042_crash.log
+          python -m llm_triage.cli diff configs/exp_baseline.yaml configs/exp_failed.yaml
+          python -m llm_triage.cli triage \
+            --log logs/run_042_crash.log \
+            --baseline configs/exp_baseline.yaml \
+            --failed configs/exp_failed.yaml \
+            --allow-partial --out-dir "$RUNNER_TEMP"
