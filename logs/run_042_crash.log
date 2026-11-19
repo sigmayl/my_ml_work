@@ -1,0 +1,38 @@
+[2024-05-18 14:32:07] INFO - accelerate launch --config_file accelerate_config.yaml --num_processes 4 train.py --config configs/exp_failed.yaml
+[2024-05-18 14:32:10] INFO - Starting training run_042 with configs/exp_failed.yaml
+[2024-05-18 14:32:11] INFO - deepspeed.initialize: zero_optimization.stage=3, offload=none, bf16=enabled
+[2024-05-18 14:32:15] INFO - Loading Llama-3-8B in bfloat16...
+[2024-05-18 14:32:58] INFO - [rank0] model loaded (8.03B params, 16.1 GB/rank sharded)
+[2024-05-18 14:32:59] INFO - [rank2] NCCL warmup ok, world_size=4, backend=nccl
+[2024-05-18 14:33:02] INFO - Step 10/1000 | Loss: 1.842 | LR: 2.00e-05
+[2024-05-18 14:35:12] INFO - Step 50/1000 | Loss: 1.213 | LR: 2.00e-05
+[2024-05-18 14:36:40] INFO - Step 70/1000 | Loss: 1.104 | LR: 1.98e-05
+[2024-05-18 14:38:45] WARNING - Step 80/1000 | Loss: 0.982 | Grad norm: 4.5
+[2024-05-18 14:39:01] ERROR - Step 81/1000 | Loss: nan
+[2024-05-18 14:39:01] ERROR - torch.distributed.elastic.multiprocessing.api: [ERROR] Caught exception in worker process:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/dist-packages/torch/nn/modules/module.py", line 1511, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/workspace/train.py", line 142, in forward
+    outputs = self.model(**inputs)
+  File "/usr/local/lib/python3.10/dist-packages/transformers/models/llama/modeling_llama.py", line 892, in forward
+    layer_outputs = decoder_layer(
+  File "/usr/local/lib/python3.10/dist-packages/deepspeed/runtime/zero/partitioned_param.py", line 402, in forward
+    return self._forward(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/autograd/function.py", line 552, in apply
+    return super().apply(*args, **kwargs)  # pylint: disable=protected-access
+RuntimeError: CUDA out of memory. Tried to allocate 2.50 GiB (GPU 0; 79.35 GiB total capacity; 76.12 GiB already allocated; 1.20 GiB free; 78.00 GiB reserved in total by PyTorch)
+[2024-05-18 14:39:01] ERROR - [rank0] torch.distributed.elastic.multiprocessing.errors.ChildFailedError:
+  train.py FAILED
+-----------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2024-05-18_14:39:01
+  host      : node-0
+  rank      : 0 (local_rank 0)
+  exitcode  : 1
+  error_file: <N/A>
+  traceback : RuntimeError: CUDA out of memory. Tried to allocate 2.50 GiB
+-----------------------------------------------------------
+[2024-05-18 14:39:02] INFO - [rank1] NCCL watchdog: aborting collective
+[2024-05-18 14:39:02] INFO - Process group destroyed.

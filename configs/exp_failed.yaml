@@ -1,0 +1,21 @@
+# run_042 — crashed at step 81. See logs/run_042_crash.log.
+model_name_or_path: meta-llama/Meta-Llama-3-8B
+dataset: tatsu-lab/alpaca
+deepspeed: ds_z3_config.json
+seed: 42
+output_dir: /workspace/runs/run_042
+training:
+  per_device_train_batch_size: 8
+  gradient_accumulation_steps: 4
+  gradient_checkpointing: false
+  learning_rate: 2.0e-5
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.03
+  num_train_epochs: 1
+  bf16: true
+  logging_steps: 10
+  save_steps: 200
+  lora_r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  max_seq_length: 2048
